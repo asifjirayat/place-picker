@@ -1,12 +1,47 @@
-# React + Vite
+# Place Picker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Create a personal collections of places you would like to visit.
 
-Currently, two official plugins are available:
+👉 Live Demo: [will updated soon...]
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Technologies Used
 
-## Expanding the ESLint configuration
+- React – Component-based UI
+- Vite – Blazing-fast development server
+- JavaScript (ES6+) – Modern JS with modules
+- Vercel – Instant deployment
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🛠 How to Clone or Fork
+
+### Clone the repo:
+
+```bash
+git clone https://github.com/asifjirayat/place-picker
+cd place-picker
+```
+
+### Install dependencies:
+
+```bash
+npm install
+```
+
+### Run locally:
+
+```bash
+npm run dev
+```
+
+### Build for production:
+
+```bash
+npm run build
+```
+
+## 📄 License
+
+This project is open source and available under the MIT License.
+
+## 🙌 Created By
+
+Designed and built with ❤️ by Asif Jirayat
