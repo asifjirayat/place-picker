@@ -1,14 +1,67 @@
+import { useRef, useState, useEffect } from "react";
 import Places from "./components/Places.jsx";
 import { AVAILABLE_PLACES } from "./utils/data.js";
 import Modal from "./components/Modal.jsx";
 import DeleteConfirmation from "./components/DeleteConfirmation.jsx";
+import { sortPlacesByDistance } from "./utils/loc.js";
 import logoImg from "./assets/logo.png";
-import { useRef, useState } from "react";
 
 const App = () => {
+  const storedIds = JSON.parse(localStorage.getItem("pickedPlaces")) || [];
+
   const modal = useRef();
   const selectedPlace = useRef();
+  const [availablePlaces, setAvailablePlaces] = useState([]);
   const [pickedPlaces, setPickedPlaces] = useState([]);
+
+  // Setting userLocation
+  useEffect(() => {
+    const defaultLocation = {
+      coords: {
+        latitude: 15.8609,
+        longitude: 74.5129,
+      },
+    };
+
+    const handleSuccess = (position) => {
+      const sortedPlaces = sortPlacesByDistance(
+        AVAILABLE_PLACES,
+        position.coords.latitude,
+        position.coords.longitude
+      );
+      setAvailablePlaces(sortedPlaces);
+    };
+
+    const handleError = (error) => {
+      console.log(
+        "Geo Location API failed. Using default coordinates:",
+        error.message
+      );
+      const sortedPlaces = sortPlacesByDistance(
+        AVAILABLE_PLACES,
+        defaultLocation.coords.latitude,
+        defaultLocation.coords.longitude
+      );
+      setAvailablePlaces(sortedPlaces);
+    };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(handleSuccess, handleError);
+    } else {
+      handleError(new Error("Geolocation not supported"));
+    }
+  }, []);
+
+  // Load picked places from localStorage
+  useEffect(() => {
+    if (availablePlaces.length > 0 && storedIds.length > 0) {
+      const storedPlaces = storedIds
+        .map((id) => AVAILABLE_PLACES.find((place) => place.id === id))
+        .filter((place) => place !== undefined);
+
+      setPickedPlaces(storedPlaces);
+    }
+  }, [availablePlaces]);
 
   // Handle removal of selected place
   const handleStartRemovePlace = (id) => {
@@ -28,15 +81,29 @@ const App = () => {
         return prevPickedPlaces;
 
       const place = AVAILABLE_PLACES.find((place) => place.id === id);
-      return [place, ...prevPickedPlaces];
+      const newPickedPlaces = [place, ...prevPickedPlaces];
+
+      // Update localStorage
+      const newIds = newPickedPlaces.map((p) => p.id);
+      localStorage.setItem("pickedPlaces", JSON.stringify(newIds));
+
+      return newPickedPlaces;
     });
   };
 
   // Handle removal of place, return filtered array
   const handleRemovePlace = () => {
-    setPickedPlaces((prevPickedPlaces) =>
-      prevPickedPlaces.filter((place) => place.id !== selectedPlace.current)
-    );
+    setPickedPlaces((prevPickedPlaces) => {
+      const updatedPlaces = prevPickedPlaces.filter(
+        (place) => place.id !== selectedPlace.current
+      );
+
+      // Update localStorage
+      const updatedIds = updatedPlaces.map((place) => place.id);
+      localStorage.setItem("pickedPlaces", JSON.stringify(updatedIds));
+
+      return updatedPlaces;
+    });
     modal.current.close();
   };
 
@@ -65,8 +132,9 @@ const App = () => {
         />
         <Places
           title="Available Places"
-          places={AVAILABLE_PLACES}
+          places={availablePlaces}
           onSelectPlace={handleSelectPlace}
+          fallbackText="Loading places...."
         />
       </main>
     </>
