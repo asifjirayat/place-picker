@@ -1,3 +1,7 @@
+import ProgressBar from "./ProgressBar";
+
+const TIMER = 5000;
+
 const DeleteConfirmation = ({ onConfirm, onCancel }) => {
   return (
     <div id="delete-confirmation">
@@ -7,10 +11,11 @@ const DeleteConfirmation = ({ onConfirm, onCancel }) => {
         <button className="button-text" onClick={onCancel}>
           No
         </button>
-        <button className="button-text" onClick={onConfirm}>
+        <button className="button" onClick={onConfirm}>
           Yes
         </button>
       </div>
+      <ProgressBar timer={TIMER} onConfirm={onConfirm} />
     </div>
   );
 };

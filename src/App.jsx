@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import Places from "./components/Places.jsx";
 import { AVAILABLE_PLACES } from "./utils/data.js";
 import Modal from "./components/Modal.jsx";
@@ -13,6 +13,7 @@ const App = () => {
   const selectedPlace = useRef();
   const [availablePlaces, setAvailablePlaces] = useState([]);
   const [pickedPlaces, setPickedPlaces] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Setting userLocation
   useEffect(() => {
@@ -33,7 +34,7 @@ const App = () => {
     };
 
     const handleError = (error) => {
-      console.log(
+      console.warn(
         "Geo Location API failed. Using default coordinates:",
         error.message
       );
@@ -65,13 +66,13 @@ const App = () => {
 
   // Handle removal of selected place
   const handleStartRemovePlace = (id) => {
-    modal.current.open();
+    setIsModalOpen(true);
     selectedPlace.current = id;
   };
 
   // Handle stop removal of place
   const handleStopRemovePlace = () => {
-    modal.current.close();
+    setIsModalOpen(false);
   };
 
   // Handle selected place by adding to the array ? add : return
@@ -92,7 +93,7 @@ const App = () => {
   };
 
   // Handle removal of place, return filtered array
-  const handleRemovePlace = () => {
+  const handleRemovePlace = useCallback(() => {
     setPickedPlaces((prevPickedPlaces) => {
       const updatedPlaces = prevPickedPlaces.filter(
         (place) => place.id !== selectedPlace.current
@@ -104,12 +105,12 @@ const App = () => {
 
       return updatedPlaces;
     });
-    modal.current.close();
-  };
+    setIsModalOpen(false);
+  }, []);
 
   return (
     <>
-      <Modal ref={modal}>
+      <Modal ref={modal} open={isModalOpen} close={handleStopRemovePlace}>
         <DeleteConfirmation
           onCancel={handleStopRemovePlace}
           onConfirm={handleRemovePlace}
